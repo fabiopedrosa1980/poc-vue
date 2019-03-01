@@ -15,19 +15,19 @@
           </div>
           <form>
             <div class="form-row">
-              <div class="form-group col-md-8">
+              <div class="form-group col-md-12">
                 <label for="codigo">Nome</label>
                 <input type="text" class="form-control uppercase" v-model="cliente.nome" maxlength="80">
               </div>
+            </div>
+            <div class="form-row">
               <div class="form-group col-md-4">
                 <label for="descricao">Email</label>
                 <input type="text" class="form-control" v-model="cliente.email" maxlength="60">
               </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-8">
+              <div class="form-group col-md-4">
                 <label for="codigo">Telefone</label>
-                <input type="text" class="form-control uppercase" v-model="cliente.telefone" maxlength="15">
+                <input type="text" class="form-control uppercase" v-mask="'(##) #####-####'" v-model="cliente.telefone" maxlength="15">
               </div>
               <div class="form-group col-md-4">
                 <label for="descricao">Sexo</label>
@@ -50,35 +50,35 @@
               Total de {{totalElements}} registros encontrado(s) | Página {{number  + 1}} de {{totalPages}} 
             </div>
             <table id="gridCliente" class="table">
-            <thead>
-                <tr v-if="loader.hasCliente">
-                <td class="text-center" colspan="3">Carregando <img src="../assets/loading.svg" alt="Carregando"></td>
-              </tr>
-              <tr>
-                <th>Nome</th>
-                <th>Email</th>
-                <th>Telefone</th>
-                <th>Sexo</th>
-                <th width="140">Ação</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-if="!totalElements">
-                <td colspan="3">Nenhum Cliente encontrado</td>
-              </tr>
-              <tr v-for="(cliente,index) in clientes" :key="index">
-                <td>{{ cliente.nome }}</td>
-                <td>{{ cliente.email }}</td>
-                <td>{{ cliente.telefone }}</td>
-                 <td>{{ cliente.sexo == "M" ? "Masculino" : "Feminino" }}</td>
-                <td>
-                  <div class="btn-group btn-group-sm">
-                    <button type="button" rel="tooltip" class="btn btn-primary" @click="getCliente(cliente)">Editar</button>&nbsp;&nbsp;
-                    <button type="button" rel="tooltip" class="btn btn-danger"  @click="removeCliente(cliente)">Excluir</button>
-                  </div>
-                </td>
-              </tr>
-           </tbody>
+              <thead>
+                  <tr v-if="loader.hasCliente">
+                  <td class="text-center" colspan="3">Carregando <img src="../assets/loading.svg" alt="Carregando"></td>
+                </tr>
+                <tr>
+                  <th>Nome</th>
+                  <th>Email</th>
+                  <th>Telefone</th>
+                  <th>Sexo</th>
+                  <th width="140">Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="!totalElements">
+                  <td colspan="5">Nenhum Cliente encontrado</td>
+                </tr>
+                <tr v-for="(cliente,index) in clientes" :key="index">
+                  <td>{{ cliente.nome }}</td>
+                  <td>{{ cliente.email }}</td>
+                  <td>{{ cliente.telefone }}</td>
+                  <td>{{ cliente.sexo == "M" ? "Masculino" : "Feminino" }}</td>
+                  <td>
+                    <div class="btn-group btn-group-sm">
+                      <button type="button" rel="tooltip" class="btn btn-primary" @click="getCliente(cliente)">Editar</button>&nbsp;&nbsp;
+                      <button type="button" rel="tooltip" class="btn btn-danger"  @click="removeCliente(cliente)">Excluir</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
           </table>
           </div>
           <div id="paginacao"  v-if="totalElements">
@@ -101,7 +101,6 @@
 </template>
 
 <script>
-import Api from '../services/Api'
 import ClienteService from '../services/ClienteService'
 export default {
   data() {
@@ -132,55 +131,26 @@ export default {
       const response = await ClienteService.getClients()
       this.paginacao(response)
     },
-    paginacao: function(response) {
-      this.clientes = response.data.content;
-      this.totalPages = response.data.totalPages;
-      this.size = response.data.size;
-      this.number = response.data.number;
-      this.last = response.data.last;
-      this.first = response.data.first;
-      this.totalElements = response.data.totalElements;
-    },
-    resetPaginacao: function(response) {
-      this.clientes = [];
-      this.totalPages = null;
-      this.size = null;
-      this.number = null;
-      this.last = null;
-      this.first =null;
-      this.totalElements = null;
-    },
     async changePage (number) {
       const response = await ClienteService.changePage(number)
       this.paginacao(response)
     },
-    setId(cliente) {
-      console.info("setid");
-      this.montaPK(cliente);
-    },
-    cancelar: function() {
-      this.message = null;
-      this.isEdicao = false;
-      this.errors= [];
-      this.cliente.nome = null;
-      this.cliente.email = null;
-      this.cliente.telefone = null;
-      this.cliente.sexo = null;
-      this.getClientes();
-    },
     async addCliente () {
       const response = await ClienteService.addClient(this.cliente)
       this.reloadPage("Cliente incluido com sucesso","alert-success col-sm-12")
+      this.limpar()
     },
     async updateCliente () {
       const response = await ClienteService.updateClient(this.clienteSelecionado)
       this.reloadPage("Cliente alterado com sucesso","alert-success col-sm-12")
+      this.limpar()
     },
     async removeCliente (cliente) {
       const response = await ClienteService.removeClient(cliente.id)
       this.reloadPage("Cliente excluido com sucesso","alert-success col-sm-12")
     },
     async getCliente (cliente) {
+      this.message = null
       const response = await ClienteService.getClient(cliente.id)
       this.cliente = response.data
       this.isEdicao = true
@@ -191,10 +161,42 @@ export default {
       this.message = msg
       this.cssClass = css
     },
-    montaPK: function(cliente){
+    montaPK(cliente){
       this.clienteSelecionado = cliente; 
-    }, 
-    checkForm: function(e) {
+    },
+    paginacao(response) {
+      this.clientes = response.data.content
+      this.totalPages = response.data.totalPages
+      this.size = response.data.size
+      this.number = response.data.number
+      this.last = response.data.last
+      this.first = response.data.first
+      this.totalElements = response.data.totalElements
+    },
+    resetPaginacao(response) {
+      this.clientes = []
+      this.totalPages = null
+      this.size = null
+      this.number = null
+      this.last = null
+      this.first =null
+      this.totalElements = null
+    },
+    cancelar() {
+      this.message = null
+      this.errors= []
+      this.limpar()
+      this.getClientes()
+    },
+    limpar() {
+      this.isEdicao = false
+      this.cliente.id = null
+      this.cliente.nome = null
+      this.cliente.email = null
+      this.cliente.telefone = null
+      this.cliente.sexo = null
+    },
+    checkForm() {
       if (this.cliente.nome && this.cliente.email && this.cliente.telefone && this.cliente.sexo) {
         if (!this.isEdicao) {
           this.addCliente();

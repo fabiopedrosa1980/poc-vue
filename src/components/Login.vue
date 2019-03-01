@@ -21,12 +21,9 @@
                       <label>Senha</label>
                       <input type="password" class="form-control form-control-lg rounded-0" v-model="senha">
                     </div>
-                    <div>
-                      <label class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input">
-                        <span class="custom-control-indicator"></span>
-                        <span class="custom-control-description small text-dark">Lembrar me</span>
-                      </label>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+                      <label class="form-check-label" for="defaultCheck1"> Lembrar me </label>  
                     </div>
                     <button class="btn btn-success btn-lg float-right" id="btnLogin"  v-on:click="login()">Login</button>
                   </form>

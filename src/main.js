@@ -7,10 +7,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faCoffee } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import VueTheMask from 'vue-the-mask'
 
 Vue.config.productionTip = false
 library.add(faCoffee)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
+Vue.use(VueTheMask)
 
 /* eslint-disable no-new */
 new Vue({
